@@ -489,11 +489,12 @@ ZSTD		= zstd
 
 # Use the wrapper for the compiler. This wrapper scans for new
 # warnings and causes the build to stop upon encountering them.
-ifeq ($(CC),$(CROSS_COMPILE)gcc)
-ifneq ($(wildcard $(srctree)/scripts/gcc-wrapper.py),)
-CC		= $(abspath $(srctree)/scripts/gcc-wrapper.py) $(CROSS_COMPILE)gcc
-endif
-endif
+# Do not use the wrapper now. Gcc 12 will emit quit a lot warnings
+# ifeq ($(CC),$(CROSS_COMPILE)gcc)
+# ifneq ($(wildcard $(srctree)/scripts/gcc-wrapper.py),)
+# CC		= $(abspath $(srctree)/scripts/gcc-wrapper.py) $(CROSS_COMPILE)gcc
+# endif
+# endif
 
 PAHOLE_FLAGS	= $(shell PAHOLE=$(PAHOLE) $(srctree)/scripts/pahole-flags.sh)
 
@@ -1476,6 +1477,9 @@ ifneq ($(dtstree),)
 %.dtb: include/config/kernel.release scripts_dtc
 	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
 
+%.dtbo: include/config/kernel.release scripts_dtc
+	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
+
 PHONY += dtbs dtbs_install dtbs_check
 dtbs: include/config/kernel.release scripts_dtc
 	$(Q)$(MAKE) $(build)=$(dtstree)
@@ -1940,7 +1944,7 @@ clean: $(clean-dirs)
 	@find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
 		\( -name '*.[aios]' -o -name '*.ko' -o -name '.*.cmd' \
 		-o -name '*.ko.*' \
-		-o -name '*.dtb' -o -name '*.dtb.S' -o -name '*.dt.yaml' \
+		-o -name '*.dtb' -o -name '*.dtbo' -o -name '*.dtb.S' -o -name '*.dt.yaml' \
 		-o -name '*.dwo' -o -name '*.lst' \
 		-o -name '*.su' -o -name '*.mod' \
 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
